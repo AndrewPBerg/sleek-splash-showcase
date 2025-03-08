@@ -39,7 +39,7 @@ const Layout = () => {
         onChange={handleSectionChange} 
       />
       
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full space-y-4 max-w-lg mx-auto w-full">
         {sections.map((section) => (
           <Section
             key={section.id}
