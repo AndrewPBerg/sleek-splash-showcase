@@ -23,6 +23,10 @@ const Layout = () => {
   }, [location]);
   
   const handleSectionChange = (id: string) => {
+    // If clicking the active section, don't do anything to prevent
+    // unnecessary animation and route change
+    if (id === activeSection) return;
+    
     navigate(`/${id}`);
     setActiveSection(id);
   };
