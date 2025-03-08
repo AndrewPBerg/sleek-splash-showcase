@@ -2,8 +2,10 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
+import { SplitText } from 'gsap/SplitText';
 
-gsap.registerPlugin(TextPlugin);
+// Register GSAP plugins
+gsap.registerPlugin(TextPlugin, SplitText);
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -13,21 +15,33 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
-  const [characters, setCharacters] = useState<string[]>([]);
-  
-  // Split the text into characters on mount
-  useEffect(() => {
-    setCharacters("Build Cool Shit".split(''));
-  }, []);
   
   useEffect(() => {
-    if (!containerRef.current || !textContainerRef.current || characters.length === 0) return;
+    if (!containerRef.current || !textContainerRef.current) return;
     
-    const charElements = textContainerRef.current.querySelectorAll('.char');
+    // Create SplitText instance for more complex animations
+    const splitText = new SplitText(textContainerRef.current, { 
+      type: "chars,words",
+      charsClass: "char",
+      wordsClass: "word"
+    });
     
+    const chars = splitText.chars;
+    const words = splitText.words;
+    
+    // Initial state setup
+    gsap.set(containerRef.current, { autoAlpha: 1 });
+    gsap.set(chars, { 
+      y: 100, 
+      opacity: 0,
+      rotationX: -90,
+      transformOrigin: "50% 50% -20"
+    });
+    
+    // Create timeline with 2 second total duration
     const tl = gsap.timeline({
       onComplete: () => {
-        // Start exit animation after main animation completes
+        // Exit animation
         const exitTl = gsap.timeline({
           onComplete: () => {
             setIsVisible(false);
@@ -37,60 +51,81 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         
         exitTl.to(containerRef.current, {
           opacity: 0,
-          duration: 0.5,
+          duration: 0.4,
           ease: "power2.inOut"
         });
       }
     });
     
-    // Initial state - hide everything
-    gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(charElements, { y: 100, opacity: 0 });
-    
-    // Animation sequence
-    tl.to(charElements, {
+    // Animation sequence with flow
+    tl.to(chars, {
+      duration: 0.6,
       y: 0,
       opacity: 1,
-      duration: 0.8,
-      stagger: 0.03,
+      rotationX: 0,
+      stagger: 0.02,
       ease: "back.out(1.7)"
     })
-    .to(charElements, {
-      y: -5,
-      yoyo: true,
-      repeat: 1,
-      duration: 0.2,
-      stagger: 0.03,
+    .to(words, {
+      duration: 0.4,
+      scale: 1.1,
+      color: "#8B5CF6", // Vivid purple for emphasis
+      stagger: 0.05,
+      ease: "power4.out"
+    }, "-=0.3")
+    .to(words, {
+      duration: 0.3,
+      scale: 1,
+      color: "white",
+      stagger: 0.05,
+      ease: "power2.in"
+    }, "-=0.1")
+    .to(chars, {
+      duration: 0.3,
+      y: -2,
+      rotationY: 10,
+      stagger: {
+        amount: 0.2,
+        from: "center",
+        grid: "auto"
+      },
       ease: "power1.inOut"
-    }, "+=0.3")
-    .to(charElements, {
-      y: 0,
+    }, "-=0.2")
+    .to(chars, {
       duration: 0.2,
-      stagger: 0.02,
+      y: 0,
+      rotationY: 0,
+      stagger: {
+        amount: 0.1,
+        from: "edges",
+      },
       ease: "power1.in"
-    }, "-=0.1");
+    });
+    
+    // Ensure total timeline duration is about 2 seconds
+    if (tl.duration() > 1.6) {
+      tl.timeScale(tl.duration() / 1.6);
+    }
     
     return () => {
       tl.kill();
+      splitText.revert();
     };
-  }, [onComplete, characters]);
+  }, [onComplete]);
   
   if (!isVisible) return null;
   
   return (
     <div 
       ref={containerRef} 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black"
     >
       <div 
         ref={textContainerRef}
-        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter overflow-hidden flex"
+        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight overflow-hidden"
+        style={{ fontFamily: "'Orbitron', sans-serif" }}
       >
-        {characters.map((char, index) => (
-          <span key={index} className="char inline-block">
-            {char === " " ? "\u00A0" : char}
-          </span>
-        ))}
+        Build Cool Shit
       </div>
     </div>
   );
