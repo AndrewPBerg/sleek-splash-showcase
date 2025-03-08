@@ -2,9 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
-import { SplitText } from 'gsap/SplitText';
 
-gsap.registerPlugin(TextPlugin, SplitText);
+gsap.registerPlugin(TextPlugin);
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -12,12 +11,20 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
+  const textContainerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
-
+  const [characters, setCharacters] = useState<string[]>([]);
+  
+  // Split the text into characters on mount
   useEffect(() => {
-    if (!containerRef.current || !textRef.current) return;
-
+    setCharacters("Build Cool Shit".split(''));
+  }, []);
+  
+  useEffect(() => {
+    if (!containerRef.current || !textContainerRef.current || characters.length === 0) return;
+    
+    const charElements = textContainerRef.current.querySelectorAll('.char');
+    
     const tl = gsap.timeline({
       onComplete: () => {
         // Start exit animation after main animation completes
@@ -35,24 +42,20 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         });
       }
     });
-
-    // Setup SplitText for the heading
-    const splitText = new SplitText(textRef.current, { type: "chars" });
-    const chars = splitText.chars;
-
+    
     // Initial state - hide everything
     gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(chars, { y: 100, opacity: 0 });
-
+    gsap.set(charElements, { y: 100, opacity: 0 });
+    
     // Animation sequence
-    tl.to(chars, {
+    tl.to(charElements, {
       y: 0,
       opacity: 1,
       duration: 0.8,
       stagger: 0.03,
       ease: "back.out(1.7)"
     })
-    .to(chars, {
+    .to(charElements, {
       y: -5,
       yoyo: true,
       repeat: 1,
@@ -60,31 +63,34 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       stagger: 0.03,
       ease: "power1.inOut"
     }, "+=0.3")
-    .to(chars, {
+    .to(charElements, {
       y: 0,
       duration: 0.2,
       stagger: 0.02,
       ease: "power1.in"
     }, "-=0.1");
-
+    
     return () => {
       tl.kill();
-      splitText.revert();
     };
-  }, [onComplete]);
-
+  }, [onComplete, characters]);
+  
   if (!isVisible) return null;
-
+  
   return (
     <div 
       ref={containerRef} 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black"
     >
       <div 
-        ref={textRef} 
-        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter overflow-hidden"
+        ref={textContainerRef}
+        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter overflow-hidden flex"
       >
-        Build Cool Shit
+        {characters.map((char, index) => (
+          <span key={index} className="char inline-block">
+            {char === " " ? "\u00A0" : char}
+          </span>
+        ))}
       </div>
     </div>
   );
