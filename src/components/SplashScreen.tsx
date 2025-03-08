@@ -2,10 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
-import { SplitText } from 'gsap/SplitText';
 
-// Register GSAP plugins
-gsap.registerPlugin(TextPlugin, SplitText);
+// Register GSAP TextPlugin
+gsap.registerPlugin(TextPlugin);
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -19,19 +18,43 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   useEffect(() => {
     if (!containerRef.current || !textContainerRef.current) return;
     
-    // Create SplitText instance for more complex animations
-    const splitText = new SplitText(textContainerRef.current, { 
-      type: "chars,words",
-      charsClass: "char",
-      wordsClass: "word"
+    // Create a simple split text effect manually instead of using SplitText plugin
+    const text = textContainerRef.current.textContent || "";
+    textContainerRef.current.innerHTML = "";
+    
+    // Create character spans
+    const chars = text.split("").map(char => {
+      const span = document.createElement("span");
+      span.textContent = char;
+      span.classList.add("char");
+      return span;
     });
     
-    const chars = splitText.chars;
-    const words = splitText.words;
+    // Create word spans with characters inside
+    const words: HTMLSpanElement[] = [];
+    let currentWord: HTMLSpanElement | null = null;
+    
+    chars.forEach(char => {
+      if (char.textContent === " ") {
+        // Add space
+        const space = document.createElement("span");
+        space.innerHTML = "&nbsp;";
+        textContainerRef.current?.appendChild(space);
+        currentWord = null;
+      } else {
+        if (!currentWord) {
+          currentWord = document.createElement("span");
+          currentWord.classList.add("word");
+          textContainerRef.current?.appendChild(currentWord);
+          words.push(currentWord);
+        }
+        currentWord.appendChild(char);
+      }
+    });
     
     // Initial state setup
     gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(chars, { 
+    gsap.set(".char", { 
       y: 100, 
       opacity: 0,
       rotationX: -90,
@@ -58,7 +81,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     });
     
     // Animation sequence with flow
-    tl.to(chars, {
+    tl.to(".char", {
       duration: 0.6,
       y: 0,
       opacity: 1,
@@ -66,21 +89,21 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       stagger: 0.02,
       ease: "back.out(1.7)"
     })
-    .to(words, {
+    .to(".word", {
       duration: 0.4,
       scale: 1.1,
       color: "#8B5CF6", // Vivid purple for emphasis
       stagger: 0.05,
       ease: "power4.out"
     }, "-=0.3")
-    .to(words, {
+    .to(".word", {
       duration: 0.3,
       scale: 1,
       color: "white",
       stagger: 0.05,
       ease: "power2.in"
     }, "-=0.1")
-    .to(chars, {
+    .to(".char", {
       duration: 0.3,
       y: -2,
       rotationY: 10,
@@ -91,7 +114,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       },
       ease: "power1.inOut"
     }, "-=0.2")
-    .to(chars, {
+    .to(".char", {
       duration: 0.2,
       y: 0,
       rotationY: 0,
@@ -109,7 +132,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     
     return () => {
       tl.kill();
-      splitText.revert();
     };
   }, [onComplete]);
   
