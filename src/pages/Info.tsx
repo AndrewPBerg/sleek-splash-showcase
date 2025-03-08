@@ -1,57 +1,33 @@
-
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { useRef } from 'react';
 
 const Info = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  useEffect(() => {
-    if (!headingRef.current || !contentRef.current) return;
-    
-    const tl = gsap.timeline();
-    
-    tl.fromTo(
-      headingRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }
-    ).fromTo(
-      contentRef.current.children,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, ease: 'power2.out' },
-      '-=0.3'
-    );
-    
-    return () => {
-      tl.kill();
-    };
-  }, []);
-  
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="section-title">About</div>
-      <h1 ref={headingRef} className="section-heading mb-6">
+    <div className="space-y-4">
+      <h1 ref={headingRef} className="text-sm font-medium tracking-tight text-primary">
         Information
       </h1>
       
-      <div ref={contentRef} className="space-y-6">
-        <p className="text-lg text-balance">
-          I'm a creative developer passionate about building exceptional digital experiences that live at the intersection of design and technology.
+      <div ref={contentRef} className="space-y-4">
+        <p className="text-xs text-muted-foreground">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.
         </p>
         
-        <p>
-          With a focus on clean, efficient code and thoughtful user interfaces, I create solutions that are both beautiful and functional. My approach combines technical expertise with creative vision to deliver projects that exceed expectations.
+        <p className="text-xs text-muted-foreground">
+          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
         </p>
         
-        <p>
-          When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or seeking inspiration in design, art, and nature.
+        <p className="text-xs text-muted-foreground">
+          Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.
         </p>
         
-        <div className="pt-4">
-          <h3 className="text-lg font-medium mb-3">Skills & Expertise</h3>
-          <div className="flex flex-wrap gap-2">
-            {['React', 'TypeScript', 'Next.js', 'GSAP', 'Node.js', 'CSS/SCSS', 'UI/UX Design', 'WebGL', 'Three.js'].map((skill) => (
-              <span key={skill} className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+        <div className="pt-2">
+          <h3 className="text-xs font-medium mb-2 text-foreground">Lorem Ipsum</h3>
+          <div className="flex flex-wrap gap-1">
+            {['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet', 'Consectetur', 'Adipiscing', 'Elit', 'Nulla'].map((skill) => (
+              <span key={skill} className="px-2 py-0.5 bg-secondary/50 text-secondary-foreground rounded-full text-[10px]">
                 {skill}
               </span>
             ))}
