@@ -13,10 +13,11 @@ interface SplashScreenProps {
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
+  const gradientRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
   
   useEffect(() => {
-    if (!containerRef.current || !textContainerRef.current) return;
+    if (!containerRef.current || !textContainerRef.current || !gradientRef.current) return;
     
     // Create a simple split text effect manually instead of using SplitText plugin
     const text = textContainerRef.current.textContent || "";
@@ -60,6 +61,10 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       rotationX: -90,
       transformOrigin: "50% 50% -20"
     });
+    gsap.set(gradientRef.current, {
+      scaleX: 0,
+      transformOrigin: "left"
+    });
     
     // Create timeline with 2 second total duration
     const tl = gsap.timeline({
@@ -81,18 +86,23 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     });
     
     // Animation sequence with flow
-    tl.to(".char", {
+    tl.to(gradientRef.current, {
+      scaleX: 1,
+      duration: 0.8,
+      ease: "power2.inOut"
+    })
+    .to(".char", {
       duration: 0.6,
       y: 0,
       opacity: 1,
       rotationX: 0,
       stagger: 0.02,
       ease: "back.out(1.7)"
-    })
+    }, "-=0.3")
     .to(".word", {
       duration: 0.4,
       scale: 1.1,
-      color: "#8B5CF6", // Vivid purple for emphasis
+      color: "#000000", // Black emphasis
       stagger: 0.05,
       ease: "power4.out"
     }, "-=0.3")
@@ -140,12 +150,16 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   return (
     <div 
       ref={containerRef} 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black"
     >
+      <div
+        ref={gradientRef}
+        className="absolute inset-0 bg-gradient-to-r from-black via-gray-800 to-white"
+      />
       <div 
         ref={textContainerRef}
-        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight overflow-hidden"
-        style={{ fontFamily: "'Orbitron', sans-serif" }}
+        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight overflow-hidden relative z-10"
+        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
       >
         Build Cool Shit
       </div>
