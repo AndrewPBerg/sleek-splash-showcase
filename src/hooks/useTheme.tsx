@@ -34,6 +34,10 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     
+    // Apply transition class first (before changing classes)
+    root.classList.add('theme-transition');
+    
+    // Remove existing theme classes
     root.classList.remove("light", "dark");
     
     if (theme === "system") {
@@ -43,10 +47,16 @@ export function ThemeProvider({
         : "light";
       
       root.classList.add(systemTheme);
-      return;
+    } else {
+      root.classList.add(theme);
     }
     
-    root.classList.add(theme);
+    // Remove transition class after the change is complete
+    const transitionTimeout = setTimeout(() => {
+      root.classList.remove('theme-transition');
+    }, 300); // Match this with the CSS transition duration
+    
+    return () => clearTimeout(transitionTimeout);
   }, [theme]);
 
   // Add listener for system theme changes
@@ -57,8 +67,17 @@ export function ThemeProvider({
     
     const handleChange = () => {
       const root = window.document.documentElement;
+      
+      // Add transition class for system theme changes
+      root.classList.add('theme-transition');
+      
       root.classList.remove("light", "dark");
       root.classList.add(mediaQuery.matches ? "dark" : "light");
+      
+      // Remove transition class after the change is complete
+      setTimeout(() => {
+        root.classList.remove('theme-transition');
+      }, 300);
     };
     
     mediaQuery.addEventListener('change', handleChange);

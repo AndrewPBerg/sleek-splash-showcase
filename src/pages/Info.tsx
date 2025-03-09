@@ -1,15 +1,11 @@
+
 import { useRef } from 'react';
 
 const Info = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
   return (
     <div className="space-y-4">
-      <h1 ref={headingRef} className="text-sm font-medium tracking-tight text-primary">
-        Information
-      </h1>
-      
       <div ref={contentRef} className="space-y-4">
         <p className="text-xs text-muted-foreground">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.

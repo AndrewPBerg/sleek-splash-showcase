@@ -33,36 +33,40 @@ const Layout = () => {
   
   // Handle button glow effect animations
   useEffect(() => {
-    // Setup animations for all section buttons
+    // First, kill any existing animations on all buttons
     sections.forEach(section => {
       const buttonRef = buttonRefs.current[section.id];
-      if (!buttonRef) return;
-      
-      // Clear any existing animations
-      gsap.killTweensOf(buttonRef);
-      
-      // If this is the active section, apply glow effect
-      if (section.id === activeSection) {
-        const tl = gsap.timeline({ repeat: -1 });
-        
-        // Create glow effect using box shadow
-        tl.to(buttonRef, {
-          boxShadow: theme === 'dark' 
-            ? '0 0 8px 2px rgba(255, 255, 255, 0.4)' 
-            : '0 0 8px 2px rgba(0, 0, 0, 0.2)',
-          duration: 1.5,
-          ease: "sine.inOut"
-        })
-        .to(buttonRef, {
-          boxShadow: '0 0 0px 0px rgba(255, 255, 255, 0)',
-          duration: 1.5,
-          ease: "sine.inOut"
-        });
+      if (buttonRef) {
+        gsap.killTweensOf(buttonRef);
+        // Reset all buttons to default state
+        gsap.set(buttonRef, { boxShadow: 'none' });
       }
     });
     
+    // Only animate the active section button
+    const activeButtonRef = buttonRefs.current[activeSection];
+    if (activeButtonRef) {
+      // Create glow effect using box shadow with grays
+      const tl = gsap.timeline({ repeat: -1 });
+      
+      const glowColor = theme === 'dark'
+        ? 'rgba(200, 200, 200, 0.5)'  // Light gray for dark mode
+        : 'rgba(80, 80, 80, 0.3)';    // Dark gray for light mode
+        
+      tl.to(activeButtonRef, {
+        boxShadow: `0 0 8px 2px ${glowColor}`,
+        duration: 1.5,
+        ease: "sine.inOut"
+      })
+      .to(activeButtonRef, {
+        boxShadow: '0 0 0px 0px rgba(128, 128, 128, 0)',
+        duration: 1.5,
+        ease: "sine.inOut"
+      });
+    }
+    
     return () => {
-      // Cleanup all animations
+      // Cleanup animations
       sections.forEach(section => {
         const buttonRef = buttonRefs.current[section.id];
         if (buttonRef) gsap.killTweensOf(buttonRef);
@@ -198,7 +202,7 @@ const Layout = () => {
       {/* Dark mode toggle */}
       <div className="fixed top-6 right-6 z-50">
         <div className="flex items-center">
-          <span className="text-xs mr-2 font-display tracking-wide">
+          <span className="text-xs mr-2 font-sans tracking-wide">
             {theme === 'dark' ? 'DARK' : 'LIGHT'}
           </span>
           <button

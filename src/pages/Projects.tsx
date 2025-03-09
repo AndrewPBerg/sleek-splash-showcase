@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
@@ -56,16 +55,13 @@ const projects = [
 ];
 
 const Projects = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(false);
   
-  // Handle scroll indicator animation and functionality
   useEffect(() => {
     if (!scrollIndicatorRef.current || !projectsRef.current) return;
     
-    // Animate scroll indicator
     const tl = gsap.timeline({
       repeat: -1,
       repeatDelay: 0.5
@@ -82,25 +78,21 @@ const Projects = () => {
       ease: "sine.inOut"
     });
     
-    // Check if at bottom on scroll
     const handleScroll = () => {
       if (!projectsRef.current) return;
       
       const { scrollTop, scrollHeight, clientHeight } = projectsRef.current;
-      // Check if scrolled to bottom (with a small threshold)
       const reachedBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 5;
       
       setIsAtBottom(reachedBottom);
       
       if (reachedBottom) {
-        // Rotate the indicator 180 degrees when at bottom
         gsap.to(scrollIndicatorRef.current, {
           rotation: 180,
           duration: 0.3,
           ease: "power2.out"
         });
       } else {
-        // Reset rotation when not at bottom
         gsap.to(scrollIndicatorRef.current, {
           rotation: 0,
           duration: 0.3,
@@ -120,25 +112,21 @@ const Projects = () => {
     };
   }, []);
   
-  // Handle click on scroll indicator
   const handleScrollClick = () => {
     if (!projectsRef.current) return;
     
     const projectsElement = projectsRef.current;
     
     if (isAtBottom) {
-      // If at bottom, scroll to top with animation
       gsap.to(projectsElement, {
         scrollTop: 0,
         duration: 0.8,
         ease: "power2.inOut"
       });
     } else {
-      // Calculate one page scroll
       const pageHeight = projectsElement.clientHeight;
       const newScrollTop = projectsElement.scrollTop + pageHeight * 0.8;
       
-      // Scroll down one page
       gsap.to(projectsElement, {
         scrollTop: newScrollTop,
         duration: 0.5,
@@ -149,10 +137,6 @@ const Projects = () => {
   
   return (
     <div className="space-y-4">
-      <h1 ref={headingRef} className="text-sm font-medium tracking-tight text-primary">
-        Projects
-      </h1>
-      
       <p className="text-xs text-muted-foreground mb-4">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia.
       </p>
@@ -186,7 +170,6 @@ const Projects = () => {
           ))}
         </div>
         
-        {/* Scroll indicator */}
         <div 
           ref={scrollIndicatorRef}
           onClick={handleScrollClick}

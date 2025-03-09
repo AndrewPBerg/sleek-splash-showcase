@@ -1,16 +1,12 @@
+
 import { useRef } from 'react';
 import { Mail, MapPin, Github, Linkedin, Twitter } from 'lucide-react';
 
 const Contact = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
   return (
     <div className="space-y-4">
-      <h1 ref={headingRef} className="text-sm font-medium tracking-tight text-primary">
-        Contact
-      </h1>
-      
       <div ref={contentRef}>
         <p className="text-xs text-muted-foreground mb-4">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia.
