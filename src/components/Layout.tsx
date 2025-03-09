@@ -5,9 +5,9 @@ import { useTheme } from '../hooks/useTheme';
 
 const sections = [
   { id: 'info', title: 'Info' },
-  { id: 'stack', title: 'My Stack' },
-  { id: 'projects', title: 'Projects' },
   { id: 'contact', title: 'Contact' },
+  { id: 'stack', title: 'Stack' },
+  { id: 'projects', title: 'Projects' },
 ];
 
 const Layout = () => {

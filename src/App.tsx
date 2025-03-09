@@ -44,9 +44,9 @@ const App = () => {
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Navigate to="/info" replace />} />
                   <Route path="info" element={<Info />} />
+                  <Route path="contact" element={<Contact />} />
                   <Route path="projects" element={<Projects />} />
                   <Route path="stack" element={<Stack />} />
-                  <Route path="contact" element={<Contact />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

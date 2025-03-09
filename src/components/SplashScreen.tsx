@@ -94,7 +94,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground dark:text-foreground tracking-tight z-10 absolute-center"
         style={{ fontFamily: "'Bebas Neue', sans-serif" }}
       >
-        Build Cool Shit
+        Andrew P. Berg
       </div>
     </div>
   );
