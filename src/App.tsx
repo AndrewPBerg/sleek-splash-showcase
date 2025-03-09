@@ -11,6 +11,7 @@ import Info from "./pages/Info";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "./hooks/useTheme";
 
 const queryClient = new QueryClient();
 
@@ -30,25 +31,27 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        {showingSplash ? (
-          <SplashScreen onComplete={handleSplashComplete} />
-        ) : (
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Navigate to="/info" replace />} />
-                <Route path="info" element={<Info />} />
-                <Route path="projects" element={<Projects />} />
-                <Route path="contact" element={<Contact />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        )}
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          {showingSplash ? (
+            <SplashScreen onComplete={handleSplashComplete} />
+          ) : (
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Navigate to="/info" replace />} />
+                  <Route path="info" element={<Info />} />
+                  <Route path="projects" element={<Projects />} />
+                  <Route path="contact" element={<Contact />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          )}
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

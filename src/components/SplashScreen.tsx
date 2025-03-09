@@ -1,10 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { TextPlugin } from 'gsap/TextPlugin';
-
-// Register GSAP TextPlugin
-gsap.registerPlugin(TextPlugin);
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -12,61 +8,18 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const gradientRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
   
   useEffect(() => {
-    if (!containerRef.current || !textContainerRef.current || !gradientRef.current) return;
-    
-    // Create a simple split text effect manually instead of using SplitText plugin
-    const text = textContainerRef.current.textContent || "";
-    textContainerRef.current.innerHTML = "";
-    
-    // Create character spans
-    const chars = text.split("").map(char => {
-      const span = document.createElement("span");
-      span.textContent = char;
-      span.classList.add("char");
-      return span;
-    });
-    
-    // Create word spans with characters inside
-    const words: HTMLSpanElement[] = [];
-    let currentWord: HTMLSpanElement | null = null;
-    
-    chars.forEach(char => {
-      if (char.textContent === " ") {
-        // Add space
-        const space = document.createElement("span");
-        space.innerHTML = "&nbsp;";
-        textContainerRef.current?.appendChild(space);
-        currentWord = null;
-      } else {
-        if (!currentWord) {
-          currentWord = document.createElement("span");
-          currentWord.classList.add("word");
-          textContainerRef.current?.appendChild(currentWord);
-          words.push(currentWord);
-        }
-        currentWord.appendChild(char);
-      }
-    });
+    if (!containerRef.current || !textRef.current || !overlayRef.current) return;
     
     // Initial state setup
     gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(".char", { 
-      y: 100, 
-      opacity: 0,
-      rotationX: -90,
-      transformOrigin: "50% 50% -20"
-    });
-    gsap.set(gradientRef.current, {
-      scaleX: 0,
-      transformOrigin: "left"
-    });
+    gsap.set(textRef.current, { autoAlpha: 0, y: 10 });
+    gsap.set(overlayRef.current, { scaleX: 0, transformOrigin: "left" });
     
-    // Create timeline with 2 second total duration
     const tl = gsap.timeline({
       onComplete: () => {
         // Exit animation
@@ -77,65 +30,45 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           }
         });
         
-        exitTl.to(containerRef.current, {
-          opacity: 0,
-          duration: 0.4,
+        exitTl.to(textRef.current, {
+          autoAlpha: 0,
+          y: -10,
+          duration: 0.3,
+          ease: "power2.in"
+        })
+        .to(overlayRef.current, {
+          scaleX: 0,
+          transformOrigin: "right",
+          duration: 0.5,
           ease: "power2.inOut"
         });
       }
     });
     
-    // Animation sequence with flow
-    tl.to(gradientRef.current, {
+    // Clean, Apple-inspired animation sequence
+    tl.to(overlayRef.current, {
       scaleX: 1,
-      duration: 0.8,
+      duration: 0.6,
       ease: "power2.inOut"
     })
-    .to(".char", {
-      duration: 0.6,
+    .to(textRef.current, {
+      autoAlpha: 1,
       y: 0,
-      opacity: 1,
-      rotationX: 0,
-      stagger: 0.02,
-      ease: "back.out(1.7)"
-    }, "-=0.3")
-    .to(".word", {
       duration: 0.4,
-      scale: 1.1,
-      color: "#000000", // Black emphasis
-      stagger: 0.05,
-      ease: "power4.out"
-    }, "-=0.3")
-    .to(".word", {
-      duration: 0.3,
-      scale: 1,
-      color: "white",
-      stagger: 0.05,
-      ease: "power2.in"
-    }, "-=0.1")
-    .to(".char", {
-      duration: 0.3,
-      y: -2,
-      rotationY: 10,
-      stagger: {
-        amount: 0.2,
-        from: "center",
-        grid: "auto"
-      },
-      ease: "power1.inOut"
-    }, "-=0.2")
-    .to(".char", {
+      ease: "power2.out"
+    })
+    .to(textRef.current, {
+      scale: 1.03,
       duration: 0.2,
-      y: 0,
-      rotationY: 0,
-      stagger: {
-        amount: 0.1,
-        from: "edges",
-      },
-      ease: "power1.in"
+      ease: "power2.out"
+    })
+    .to(textRef.current, {
+      scale: 1,
+      duration: 0.2,
+      ease: "power2.in"
     });
     
-    // Ensure total timeline duration is about 2 seconds
+    // Ensure total duration is about 2 seconds
     if (tl.duration() > 1.6) {
       tl.timeScale(tl.duration() / 1.6);
     }
@@ -150,15 +83,15 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   return (
     <div 
       ref={containerRef} 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background dark:bg-background"
     >
       <div
-        ref={gradientRef}
-        className="absolute inset-0 bg-gradient-to-r from-black via-gray-800 to-white"
+        ref={overlayRef}
+        className="absolute inset-0 bg-background dark:bg-background"
       />
       <div 
-        ref={textContainerRef}
-        className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight overflow-hidden relative z-10"
+        ref={textRef}
+        className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-foreground dark:text-foreground tracking-tight z-10"
         style={{ fontFamily: "'Bebas Neue', sans-serif" }}
       >
         Build Cool Shit

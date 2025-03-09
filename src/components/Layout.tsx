@@ -1,6 +1,9 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
 import gsap from 'gsap';
+import { useTheme } from '../hooks/useTheme';
 
 const sections = [
   { id: 'info', title: 'Info' },
@@ -15,8 +18,10 @@ const Layout = () => {
   const [previousSection, setPreviousSection] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const buttonsRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const animationRefs = useRef<Record<string, gsap.core.Timeline | null>>({});
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const { theme, setTheme } = useTheme();
   
   // Update active section based on route
   useEffect(() => {
@@ -27,7 +32,67 @@ const Layout = () => {
     }
   }, [location, activeSection]);
   
-  // Handle animations when active section changes
+  // Handle button indicators animations
+  useEffect(() => {
+    // Setup animations for all section buttons
+    sections.forEach(section => {
+      const buttonRef = buttonRefs.current[section.id];
+      if (!buttonRef) return;
+      
+      // Kill any existing animation for this button
+      if (animationRefs.current[section.id]) {
+        animationRefs.current[section.id]?.kill();
+      }
+      
+      // If this is the active section, animate the indicator
+      if (section.id === activeSection) {
+        const tl = gsap.timeline({ repeat: -1 });
+        
+        // Create animated particle
+        const particle = document.createElement('div');
+        particle.className = "absolute w-1 h-1 rounded-full bg-primary/80";
+        buttonRef.appendChild(particle);
+        
+        // Set initial position
+        gsap.set(particle, { 
+          left: '0%',
+          top: '50%', 
+          xPercent: -50, 
+          yPercent: -50,
+          opacity: 0
+        });
+        
+        // Animate the particle around the button
+        tl.to(particle, {
+          keyframes: [
+            { left: '0%', top: '50%', opacity: 1, duration: 0.1 },
+            { left: '50%', top: '0%', duration: 0.5, ease: "sine.inOut" },
+            { left: '100%', top: '50%', duration: 0.5, ease: "sine.inOut" },
+            { left: '50%', top: '100%', duration: 0.5, ease: "sine.inOut" },
+            { left: '0%', top: '50%', duration: 0.5, ease: "sine.inOut" },
+            { opacity: 0, duration: 0.1 }
+          ],
+          duration: 2.1
+        });
+        
+        animationRefs.current[section.id] = tl;
+      } else {
+        // For inactive buttons, remove any particles
+        buttonRef.querySelectorAll('div').forEach(el => {
+          if (el.classList.contains('bg-primary/80')) {
+            el.remove();
+          }
+        });
+      }
+    });
+    
+    return () => {
+      // Cleanup all animations
+      Object.values(animationRefs.current).forEach(tl => tl?.kill());
+    };
+  }, [activeSection]);
+  
+  // Handle content animations
   useEffect(() => {
     const activeContentRef = contentRefs.current[activeSection];
     if (!activeContentRef) return;
@@ -146,10 +211,29 @@ const Layout = () => {
     }
   };
   
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+  
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
+      {/* Dark mode toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary hover:bg-secondary/80 transition-colors focus:outline-none"
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? (
+            <Sun size={18} className="text-secondary-foreground" />
+          ) : (
+            <Moon size={18} className="text-secondary-foreground" />
+          )}
+        </button>
+      </div>
+      
       <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 items-end">
-        <div ref={buttonsRef} className="flex flex-col gap-6 items-end">
+        <div className="flex flex-col gap-6 items-end">
           {sections.map((section) => (
             <div key={section.id} className="relative">
               <button
@@ -159,11 +243,14 @@ const Layout = () => {
                 }`}
                 disabled={isAnimating}
               >
-                <div className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                  section.id === activeSection 
-                    ? 'bg-primary' 
-                    : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'
-                }`} />
+                <div 
+                  ref={el => buttonRefs.current[section.id] = el}
+                  className={`relative flex items-center justify-center h-3 w-3 rounded-full transition-all duration-300 overflow-visible ${
+                    section.id === activeSection 
+                      ? 'bg-primary' 
+                      : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'
+                  }`} 
+                />
                 <span className={`text-xs tracking-wide transition-colors duration-300 ${
                   section.id === activeSection 
                     ? 'text-primary font-medium' 

@@ -1,4 +1,7 @@
-import { useRef } from 'react';
+
+import { useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
+import gsap from 'gsap';
 
 const projects = [
   {
@@ -55,6 +58,32 @@ const projects = [
 const Projects = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  
+  // Animate scroll indicator
+  useEffect(() => {
+    if (!scrollIndicatorRef.current) return;
+    
+    const tl = gsap.timeline({
+      repeat: -1,
+      repeatDelay: 1
+    });
+    
+    tl.to(scrollIndicatorRef.current, {
+      y: 8,
+      duration: 1,
+      ease: "power2.inOut"
+    })
+    .to(scrollIndicatorRef.current, {
+      y: 0,
+      duration: 1,
+      ease: "power2.inOut"
+    });
+    
+    return () => {
+      tl.kill();
+    };
+  }, []);
   
   return (
     <div className="space-y-4">
@@ -66,32 +95,43 @@ const Projects = () => {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia.
       </p>
       
-      <div ref={projectsRef} className="space-y-5 max-h-[400px] invisible-scroll">
-        {projects.map((project) => (
-          <div 
-            key={project.id} 
-            className="group relative"
-          >
-            <div className="aspect-video overflow-hidden rounded-sm h-24 mb-2">
-              <img 
-                src={project.image} 
-                alt={project.title} 
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
+      <div className="relative">
+        <div ref={projectsRef} className="space-y-5 max-h-[400px] invisible-scroll pb-8">
+          {projects.map((project) => (
+            <div 
+              key={project.id} 
+              className="group relative"
+            >
+              <div className="aspect-video overflow-hidden rounded-sm h-24 mb-2">
+                <img 
+                  src={project.image} 
+                  alt={project.title} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <h3 className="text-xs font-medium">{project.title}</h3>
+              <p className="mt-1 text-muted-foreground text-[10px]">{project.description}</p>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {project.tags.map((tag) => (
+                  <span key={tag} className="px-1.5 py-0.5 bg-secondary/50 text-secondary-foreground rounded-full text-[10px]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-            
-            <h3 className="text-xs font-medium">{project.title}</h3>
-            <p className="mt-1 text-muted-foreground text-[10px]">{project.description}</p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {project.tags.map((tag) => (
-                <span key={tag} className="px-1.5 py-0.5 bg-secondary/50 text-secondary-foreground rounded-full text-[10px]">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        
+        {/* Scroll indicator */}
+        <div 
+          ref={scrollIndicatorRef}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-70 pointer-events-none"
+        >
+          <span className="text-[10px] text-muted-foreground mb-1">Scroll</span>
+          <ChevronDown size={16} className="text-muted-foreground" />
+        </div>
       </div>
     </div>
   );
