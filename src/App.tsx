@@ -10,6 +10,7 @@ import Layout from "./components/Layout";
 import Info from "./pages/Info";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
+import Stack from "./pages/Stack";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./hooks/useTheme";
 
@@ -44,6 +45,7 @@ const App = () => {
                   <Route index element={<Navigate to="/info" replace />} />
                   <Route path="info" element={<Info />} />
                   <Route path="projects" element={<Projects />} />
+                  <Route path="stack" element={<Stack />} />
                   <Route path="contact" element={<Contact />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />

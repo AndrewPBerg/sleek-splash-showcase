@@ -5,6 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 
 const sections = [
   { id: 'info', title: 'Info' },
+  { id: 'stack', title: 'My Stack' },
   { id: 'projects', title: 'Projects' },
   { id: 'contact', title: 'Contact' },
 ];
@@ -39,7 +40,7 @@ const Layout = () => {
     
     const activeButtonRef = buttonRefs.current[activeSection];
     if (activeButtonRef) {
-      const tl = gsap.timeline({ repeat: -1 });
+      const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
       
       const glowColor = theme === 'dark'
         ? 'rgba(200, 200, 200, 0.5)'
@@ -47,12 +48,12 @@ const Layout = () => {
       
       tl.to(activeButtonRef, {
         boxShadow: `0 0 8px 2px ${glowColor}`,
-        duration: 0.8,
+        duration: 0.4,
         ease: "sine.inOut"
       })
       .to(activeButtonRef, {
         boxShadow: '0 0 0px 0px rgba(128, 128, 128, 0)',
-        duration: 0.8,
+        duration: 0.4,
         ease: "sine.inOut"
       });
     }
@@ -170,6 +171,11 @@ const Layout = () => {
   };
   
   const toggleTheme = () => {
+    document.body.classList.add('theme-transition');
+    setTimeout(() => {
+      document.body.classList.remove('theme-transition');
+    }, 300);
+    
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
   
