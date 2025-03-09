@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Moon, Sun } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import { useTheme } from '../hooks/useTheme';
 
@@ -19,7 +19,6 @@ const Layout = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const animationRefs = useRef<Record<string, gsap.core.Timeline | null>>({});
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const { theme, setTheme } = useTheme();
   
@@ -32,65 +31,44 @@ const Layout = () => {
     }
   }, [location, activeSection]);
   
-  // Handle button indicators animations
+  // Handle button glow effect animations
   useEffect(() => {
     // Setup animations for all section buttons
     sections.forEach(section => {
       const buttonRef = buttonRefs.current[section.id];
       if (!buttonRef) return;
       
-      // Kill any existing animation for this button
-      if (animationRefs.current[section.id]) {
-        animationRefs.current[section.id]?.kill();
-      }
+      // Clear any existing animations
+      gsap.killTweensOf(buttonRef);
       
-      // If this is the active section, animate the indicator
+      // If this is the active section, apply glow effect
       if (section.id === activeSection) {
         const tl = gsap.timeline({ repeat: -1 });
         
-        // Create animated particle
-        const particle = document.createElement('div');
-        particle.className = "absolute w-1 h-1 rounded-full bg-primary/80";
-        buttonRef.appendChild(particle);
-        
-        // Set initial position
-        gsap.set(particle, { 
-          left: '0%',
-          top: '50%', 
-          xPercent: -50, 
-          yPercent: -50,
-          opacity: 0
-        });
-        
-        // Animate the particle around the button
-        tl.to(particle, {
-          keyframes: [
-            { left: '0%', top: '50%', opacity: 1, duration: 0.1 },
-            { left: '50%', top: '0%', duration: 0.5, ease: "sine.inOut" },
-            { left: '100%', top: '50%', duration: 0.5, ease: "sine.inOut" },
-            { left: '50%', top: '100%', duration: 0.5, ease: "sine.inOut" },
-            { left: '0%', top: '50%', duration: 0.5, ease: "sine.inOut" },
-            { opacity: 0, duration: 0.1 }
-          ],
-          duration: 2.1
-        });
-        
-        animationRefs.current[section.id] = tl;
-      } else {
-        // For inactive buttons, remove any particles
-        buttonRef.querySelectorAll('div').forEach(el => {
-          if (el.classList.contains('bg-primary/80')) {
-            el.remove();
-          }
+        // Create glow effect using box shadow
+        tl.to(buttonRef, {
+          boxShadow: theme === 'dark' 
+            ? '0 0 8px 2px rgba(255, 255, 255, 0.4)' 
+            : '0 0 8px 2px rgba(0, 0, 0, 0.2)',
+          duration: 1.5,
+          ease: "sine.inOut"
+        })
+        .to(buttonRef, {
+          boxShadow: '0 0 0px 0px rgba(255, 255, 255, 0)',
+          duration: 1.5,
+          ease: "sine.inOut"
         });
       }
     });
     
     return () => {
       // Cleanup all animations
-      Object.values(animationRefs.current).forEach(tl => tl?.kill());
+      sections.forEach(section => {
+        const buttonRef = buttonRefs.current[section.id];
+        if (buttonRef) gsap.killTweensOf(buttonRef);
+      });
     };
-  }, [activeSection]);
+  }, [activeSection, theme]);
   
   // Handle content animations
   useEffect(() => {
@@ -218,18 +196,29 @@ const Layout = () => {
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
       {/* Dark mode toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          onClick={toggleTheme}
-          className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary hover:bg-secondary/80 transition-colors focus:outline-none"
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          {theme === 'dark' ? (
-            <Sun size={18} className="text-secondary-foreground" />
-          ) : (
-            <Moon size={18} className="text-secondary-foreground" />
-          )}
-        </button>
+      <div className="fixed top-6 right-6 z-50">
+        <div className="flex items-center">
+          <span className="text-xs mr-2 font-display tracking-wide">
+            {theme === 'dark' ? 'DARK' : 'LIGHT'}
+          </span>
+          <button
+            onClick={toggleTheme}
+            className={`w-10 h-6 transition-colors duration-300 ${
+              theme === 'dark' 
+                ? 'bg-primary border-primary' 
+                : 'bg-secondary border-secondary'
+            } border rounded-sm`}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <div 
+              className={`w-3 h-3 transition-all duration-300 ${
+                theme === 'dark' 
+                  ? 'bg-background ml-5' 
+                  : 'bg-foreground ml-2'
+              }`}
+            />
+          </button>
+        </div>
       </div>
       
       <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 items-end">
@@ -245,7 +234,7 @@ const Layout = () => {
               >
                 <div 
                   ref={el => buttonRefs.current[section.id] = el}
-                  className={`relative flex items-center justify-center h-3 w-3 rounded-full transition-all duration-300 overflow-visible ${
+                  className={`relative flex items-center justify-center h-3 w-3 rounded-full transition-all duration-300 ${
                     section.id === activeSection 
                       ? 'bg-primary' 
                       : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'

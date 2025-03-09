@@ -1,5 +1,5 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -59,31 +59,93 @@ const Projects = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(false);
   
-  // Animate scroll indicator
+  // Handle scroll indicator animation and functionality
   useEffect(() => {
-    if (!scrollIndicatorRef.current) return;
+    if (!scrollIndicatorRef.current || !projectsRef.current) return;
     
+    // Animate scroll indicator
     const tl = gsap.timeline({
       repeat: -1,
-      repeatDelay: 1
+      repeatDelay: 0.5
     });
     
     tl.to(scrollIndicatorRef.current, {
-      y: 8,
-      duration: 1,
-      ease: "power2.inOut"
+      y: 6,
+      duration: 0.8,
+      ease: "sine.inOut"
     })
     .to(scrollIndicatorRef.current, {
       y: 0,
-      duration: 1,
-      ease: "power2.inOut"
+      duration: 0.8,
+      ease: "sine.inOut"
     });
+    
+    // Check if at bottom on scroll
+    const handleScroll = () => {
+      if (!projectsRef.current) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = projectsRef.current;
+      // Check if scrolled to bottom (with a small threshold)
+      const reachedBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 5;
+      
+      setIsAtBottom(reachedBottom);
+      
+      if (reachedBottom) {
+        // Rotate the indicator 180 degrees when at bottom
+        gsap.to(scrollIndicatorRef.current, {
+          rotation: 180,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      } else {
+        // Reset rotation when not at bottom
+        gsap.to(scrollIndicatorRef.current, {
+          rotation: 0,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      }
+    };
+    
+    const projectsElement = projectsRef.current;
+    projectsElement.addEventListener('scroll', handleScroll);
     
     return () => {
       tl.kill();
+      if (projectsElement) {
+        projectsElement.removeEventListener('scroll', handleScroll);
+      }
     };
   }, []);
+  
+  // Handle click on scroll indicator
+  const handleScrollClick = () => {
+    if (!projectsRef.current) return;
+    
+    const projectsElement = projectsRef.current;
+    
+    if (isAtBottom) {
+      // If at bottom, scroll to top with animation
+      gsap.to(projectsElement, {
+        scrollTop: 0,
+        duration: 0.8,
+        ease: "power2.inOut"
+      });
+    } else {
+      // Calculate one page scroll
+      const pageHeight = projectsElement.clientHeight;
+      const newScrollTop = projectsElement.scrollTop + pageHeight * 0.8;
+      
+      // Scroll down one page
+      gsap.to(projectsElement, {
+        scrollTop: newScrollTop,
+        duration: 0.5,
+        ease: "power2.out"
+      });
+    }
+  };
   
   return (
     <div className="space-y-4">
@@ -127,9 +189,9 @@ const Projects = () => {
         {/* Scroll indicator */}
         <div 
           ref={scrollIndicatorRef}
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-70 pointer-events-none"
+          onClick={handleScrollClick}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-secondary/30 backdrop-blur-sm cursor-pointer hover:bg-secondary/50 transition-colors"
         >
-          <span className="text-[10px] text-muted-foreground mb-1">Scroll</span>
           <ChevronDown size={16} className="text-muted-foreground" />
         </div>
       </div>
