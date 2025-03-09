@@ -1,7 +1,5 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import { useTheme } from '../hooks/useTheme';
 
@@ -22,7 +20,6 @@ const Layout = () => {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const { theme, setTheme } = useTheme();
   
-  // Update active section based on route
   useEffect(() => {
     const path = location.pathname.slice(1) || 'info';
     if (path !== activeSection) {
@@ -31,42 +28,36 @@ const Layout = () => {
     }
   }, [location, activeSection]);
   
-  // Handle button glow effect animations
   useEffect(() => {
-    // First, kill any existing animations on all buttons
     sections.forEach(section => {
       const buttonRef = buttonRefs.current[section.id];
       if (buttonRef) {
         gsap.killTweensOf(buttonRef);
-        // Reset all buttons to default state
         gsap.set(buttonRef, { boxShadow: 'none' });
       }
     });
     
-    // Only animate the active section button
     const activeButtonRef = buttonRefs.current[activeSection];
     if (activeButtonRef) {
-      // Create glow effect using box shadow with grays
       const tl = gsap.timeline({ repeat: -1 });
       
       const glowColor = theme === 'dark'
-        ? 'rgba(200, 200, 200, 0.5)'  // Light gray for dark mode
-        : 'rgba(80, 80, 80, 0.3)';    // Dark gray for light mode
-        
+        ? 'rgba(200, 200, 200, 0.5)'
+        : 'rgba(80, 80, 80, 0.3)';
+      
       tl.to(activeButtonRef, {
         boxShadow: `0 0 8px 2px ${glowColor}`,
-        duration: 1.5,
+        duration: 0.8,
         ease: "sine.inOut"
       })
       .to(activeButtonRef, {
         boxShadow: '0 0 0px 0px rgba(128, 128, 128, 0)',
-        duration: 1.5,
+        duration: 0.8,
         ease: "sine.inOut"
       });
     }
     
     return () => {
-      // Cleanup animations
       sections.forEach(section => {
         const buttonRef = buttonRefs.current[section.id];
         if (buttonRef) gsap.killTweensOf(buttonRef);
@@ -74,17 +65,14 @@ const Layout = () => {
     };
   }, [activeSection, theme]);
   
-  // Handle content animations
   useEffect(() => {
     const activeContentRef = contentRefs.current[activeSection];
     if (!activeContentRef) return;
     
-    // Kill any existing animations
     if (tlRef.current) {
       tlRef.current.kill();
     }
     
-    // Don't animate on initial load
     if (!previousSection) {
       gsap.set(activeContentRef, { opacity: 1, y: 0, x: 0 });
       return;
@@ -92,7 +80,6 @@ const Layout = () => {
     
     setIsAnimating(true);
     
-    // Create animation timeline with better easing
     const tl = gsap.timeline({
       defaults: {
         ease: "power3.out",
@@ -105,7 +92,6 @@ const Layout = () => {
     
     tlRef.current = tl;
     
-    // Set initial state
     gsap.set(activeContentRef, { 
       opacity: 0, 
       y: -8, 
@@ -113,15 +99,13 @@ const Layout = () => {
       display: 'block'
     });
     
-    // Animate in with better easing
     tl.to(activeContentRef, { 
       opacity: 1, 
       y: 0, 
       x: 0, 
-      clearProps: "transform" // Clean up transforms for better performance
+      clearProps: "transform"
     });
     
-    // Animate children with stagger
     if (activeContentRef.children.length > 0 && activeContentRef.children[0].children.length > 0) {
       tl.fromTo(
         activeContentRef.children[0].children,
@@ -136,9 +120,9 @@ const Layout = () => {
           scale: 1,
           stagger: 0.03, 
           duration: 0.4,
-          clearProps: "transform,opacity" // Clean up for better performance
+          clearProps: "transform,opacity"
         },
-        "-=0.35" // More overlap for smoother animation
+        "-=0.35"
       );
     }
     
@@ -150,36 +134,29 @@ const Layout = () => {
   }, [activeSection, previousSection]);
   
   const handleSectionChange = (id: string) => {
-    // Prevent changing during animation or if already on this section
     if (isAnimating || id === activeSection) return;
     
-    // Start animation
     setIsAnimating(true);
     
-    // Get current content ref
     const currentContentRef = contentRefs.current[activeSection];
     
     if (currentContentRef) {
-      // Kill any existing animations
       if (tlRef.current) {
         tlRef.current.kill();
       }
       
-      // Create a new timeline for exit animation
       const exitTl = gsap.timeline({
         defaults: {
           ease: "power2.in",
           duration: 0.3
         },
         onComplete: () => {
-          // After animation completes, navigate to new route
           navigate(`/${id}`);
         }
       });
       
       tlRef.current = exitTl;
       
-      // Animate out current content with better easing
       exitTl.to(currentContentRef, {
         opacity: 0,
         y: -4,
@@ -187,7 +164,6 @@ const Layout = () => {
         scale: 0.99
       });
     } else {
-      // If no current content, just navigate
       navigate(`/${id}`);
       setIsAnimating(false);
     }
@@ -199,7 +175,6 @@ const Layout = () => {
   
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
-      {/* Dark mode toggle */}
       <div className="fixed top-6 right-6 z-50">
         <div className="flex items-center">
           <span className="text-xs mr-2 font-sans tracking-wide">
@@ -257,7 +232,7 @@ const Layout = () => {
                 <div 
                   ref={el => contentRefs.current[section.id] = el}
                   className="content-container mt-6 w-80 pr-6"
-                  style={{ opacity: 0 }} // Start invisible to prevent flash
+                  style={{ opacity: 0 }}
                 >
                   <div>
                     <Outlet />

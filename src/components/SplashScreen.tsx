@@ -17,7 +17,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     
     // Initial state setup
     gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(textRef.current, { autoAlpha: 0, y: 10 });
+    gsap.set(textRef.current, { autoAlpha: 0, y: 5 }); // Smaller movement
     gsap.set(overlayRef.current, { scaleX: 0, transformOrigin: "left" });
     
     const tl = gsap.timeline({
@@ -32,8 +32,8 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         
         exitTl.to(textRef.current, {
           autoAlpha: 0,
-          y: -10,
-          duration: 0.3,
+          y: -5, // Smaller movement
+          duration: 0.25,
           ease: "power2.in"
         })
         .to(overlayRef.current, {
@@ -58,7 +58,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       ease: "power2.out"
     })
     .to(textRef.current, {
-      scale: 1.03,
+      scale: 1.02, // Smaller scale effect
       duration: 0.2,
       ease: "power2.out"
     })
@@ -91,7 +91,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       />
       <div 
         ref={textRef}
-        className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-foreground dark:text-foreground tracking-tight z-10"
+        className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground dark:text-foreground tracking-tight z-10 absolute-center"
         style={{ fontFamily: "'Bebas Neue', sans-serif" }}
       >
         Build Cool Shit
