@@ -8,15 +8,15 @@ const Info = () => {
     <div className="space-y-4">
       <div ref={contentRef} className="space-y-4">
         <p className="text-s text-muted-foreground">
-          Full Stack and AI Developer
+          AI & Full-Stack Developer
         </p>
         
         <p className="text-xs text-muted-foreground">
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
+          Building the future of intelligent applications.
         </p>
         
         <p className="text-xs text-muted-foreground">
-          Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.
+          Born in 2004 in New York. Currently in the Southeastern US. Looking to travel the world, then change it.
         </p>
         
         {/* <div className="pt-2"> */}

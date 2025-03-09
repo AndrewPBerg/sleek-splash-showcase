@@ -6,88 +6,53 @@ import gsap from 'gsap';
 const projects = [
   {
     id: 'project1',
-    title: 'Lorem Ipsum',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.',
-    tags: ['Lorem', 'Ipsum', 'Dolor'],
-    dateRange: 'Jan 2020 - Mar 2021',
+    title: 'UAV Classification',
+    description: 'Transformer and CNN model training on a limited spectral dataset. Currently under review for publication(s).',
+    tags: ['Python', 'Pytorch', 'Transformers', 'Docker'],
+    dateRange: 'Sep 2024 - Present',
     links: {
-      github: 'https://github.com',
-      website: 'https://example.com',
+      github: 'https://github.com/AndrewPBerg/UAV_Classification',
+      website: null,
       paper: null
     }
   },
   {
     id: 'project2',
-    title: 'Dolor Sit Amet',
-    description: 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
-    tags: ['Sit', 'Amet', 'Consectetur'],
-    dateRange: 'Apr 2021 - Present',
+    title: 'DNS Fuzzing',
+    description: 'Domain monitoring and secutiry analysis tool. Currently under private development.',
+    tags: ['Python', 'React', 'Docker', 'Pub/Sub', 'MySQL'],
+    dateRange: 'Jan 2025 - Present',
     links: {
-      github: 'https://github.com',
+      github: null,
       website: null,
-      paper: 'https://example.com/paper.pdf'
-    }
-  },
-  {
-    id: 'project3',
-    title: 'Consectetur Adipiscing',
-    description: 'Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est.',
-    tags: ['Adipiscing', 'Elit', 'Nulla'],
-    dateRange: 'Jun 2019 - Dec 2019',
-    links: {
-      github: 'https://github.com',
-      website: 'https://example.com',
       paper: null
     }
   },
   {
     id: 'project4',
-    title: 'Vestibulum Tortor',
-    description: 'Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi.',
-    tags: ['Vestibulum', 'Tortor', 'Quam'],
-    dateRange: 'Jan 2018 - May 2019',
+    title: 'Dope Dictionary',
+    description: 'AI dictionary of custom styles and words.',
+    tags: ['Python', 'GoogleAI', 'Spring Boot', 'Django'],
+    dateRange: 'Nov 2024 - Dec 2024',
     links: {
-      github: null,
-      website: 'https://example.com',
-      paper: 'https://example.com/paper.pdf'
-    }
-  },
-  {
-    id: 'project5',
-    title: 'Aenean Fermentum',
-    description: 'Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci.',
-    tags: ['Aenean', 'Fermentum', 'Elit'],
-    dateRange: 'Sep 2017 - Dec 2017',
-    links: {
-      github: 'https://github.com',
+      github: 'https://github.com/AndrewPBeratings-prediction',
       website: null,
       paper: null
     }
   },
   {
-    id: 'project6',
-    title: 'Fusce Commodo',
-    description: 'Fusce commodo aliquam arcu. Nam commodo suscipit quam. Vestibulum ullamcorper mauris.',
-    tags: ['Fusce', 'Commodo', 'Aliquam'],
-    dateRange: 'Mar 2017 - Aug 2017',
+    id: 'project3',
+    title: 'Wine Price Regression',
+    description: 'Machine/Deep Learning models for prediction wine prices from web scraped data.',
+    tags: ['Python', 'Jupyter', 'Pandas', 'Scikit-learn', 'Pytorch', 'Matplotlib', 'Seaborn'],
+    dateRange: 'Nov 2024 - Dec 2024',
     links: {
-      github: 'https://github.com',
-      website: 'https://example.com',
+      github: 'https://github.com/riordanaa/Wine---price-ratings-prediction',
+      website: null,
       paper: null
     }
   },
-  {
-    id: 'project7',
-    title: 'Praesent Egestas',
-    description: 'Praesent egestas neque eu enim. In hac habitasse platea dictumst. Maecenas tempus.',
-    tags: ['Praesent', 'Egestas', 'Neque'],
-    dateRange: 'Jan 2017 - Feb 2017',
-    links: {
-      github: null,
-      website: null,
-      paper: 'https://example.com/paper.pdf'
-    }
-  }
+
 ];
 
 const Projects = () => {
@@ -174,7 +139,8 @@ const Projects = () => {
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted-foreground mb-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl vel ultricies lacinia.
+        Projects are updated as I see fit. Some are open-source, some are not. <br />
+        Listed by importance.
       </p>
       
       <div className="relative">
