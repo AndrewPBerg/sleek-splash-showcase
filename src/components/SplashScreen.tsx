@@ -91,7 +91,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       />
       <div 
         ref={textRef}
-        className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground dark:text-foreground tracking-tight z-10 absolute-center"
+        className="font-display text-1xl sm:text-2xl md:text-3xl text-foreground dark:text-foreground tracking-tight z-10 absolute-center"
         style={{ fontFamily: "'Bebas Neue', sans-serif" }}
       >
         Andrew P. Berg
