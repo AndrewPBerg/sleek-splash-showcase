@@ -1,9 +1,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
-import TOPOLOGY from 'vanta/dist/vanta.topology.min';
 import * as THREE from 'three';
 import gsap from 'gsap';
+
+// Import the full Vanta.js library instead of just the Topology effect
+// This ensures we have all dependencies properly loaded
+import VANTA from 'vanta/dist/vanta.topology.min';
 
 interface GlobeEffectProps {
   activeSection: string;
@@ -76,8 +79,10 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   
   useEffect(() => {
     if (!vantaEffect && vantaRef.current) {
-      // Create base configuration for topology
+      // Create base configuration for topology with more conservative settings
       const baseConfig = {
+        el: vantaRef.current,
+        THREE: THREE,
         mouseControls: false,
         touchControls: false,
         gyroControls: false,
@@ -85,28 +90,42 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        points: 15,
-        maxDistance: 25.00,
-        spacing: 16.00,
-        backgroundColor: 0x0,
-        showDots: true,
+        points: 10,
+        maxDistance: 20.00,
+        spacing: 15.00,
+        showDots: true
       };
       
-      // Initialize the effect with base config + theme colors
-      const config = {
+      // Merge configurations
+      const colors = getThemeColors();
+      const sectionConfig = getSectionConfig();
+      
+      // Debug the configuration
+      console.log("Initializing Topology with config:", {
         ...baseConfig,
-        ...getThemeColors(),
-        ...getSectionConfig(),
-        el: vantaRef.current,
-        THREE: THREE
-      };
+        ...colors,
+        ...sectionConfig
+      });
       
-      const effect = TOPOLOGY(config);
-      setVantaEffect(effect);
+      // Initialize the effect
+      try {
+        const effect = VANTA.TOPOLOGY({
+          ...baseConfig,
+          ...colors,
+          ...sectionConfig
+        });
+        setVantaEffect(effect);
+        console.log("Topology effect initialized successfully");
+      } catch (error) {
+        console.error("Failed to initialize Topology effect:", error);
+      }
     }
     
     return () => {
-      if (vantaEffect) vantaEffect.destroy();
+      if (vantaEffect) {
+        console.log("Cleaning up Topology effect");
+        vantaEffect.destroy();
+      }
     };
   }, []);
   
@@ -114,6 +133,7 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   useEffect(() => {
     if (vantaEffect) {
       const colors = getThemeColors();
+      console.log("Updating colors for theme:", theme, colors);
       vantaEffect.setOptions({
         color: colors.color,
         color2: colors.color2,
@@ -127,6 +147,8 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
     if (vantaEffect && vantaEffect.camera) {
       const sectionConfig = getSectionConfig();
       const [targetX, targetY, targetZ] = sectionConfig.cameraPosition;
+      
+      console.log("Animating camera to:", { targetX, targetY, targetZ });
       
       // Kill any ongoing animations to prevent rubber-banding
       gsap.killTweensOf(vantaEffect.camera.position);
@@ -146,7 +168,7 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-3/5 h-full z-10 pointer-events-none transition-opacity duration-500 pl-12 pr-12 pt-12 pb-12"
+      className="fixed top-0 left-0 w-3/5 h-full z-10 pointer-events-none transition-opacity duration-500 pl-14 pr-14 pt-14 pb-14"
       aria-hidden="true"
     />
   );
