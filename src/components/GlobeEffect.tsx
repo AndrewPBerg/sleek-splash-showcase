@@ -1,11 +1,17 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import NET from 'vanta/dist/vanta.globe.min';
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 interface GlobeEffectProps {
   activeSection: string;
+}
+
+interface SectionConfig {
+  cameraPosition: [number, number, number];
+  backgroundColor: number;
+  speed: number;
 }
 
 const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
@@ -13,59 +19,40 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   const [vantaEffect, setVantaEffect] = useState<any>(null);
   const { theme } = useTheme();
   
-  // Configuration based on active section
-  const getSectionConfig = () => {
+  // Configuration based on active section - now just camera position
+  const getSectionConfig = (): SectionConfig => {
     const baseConfig = {
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      size: 1.5,
+      backgroundColor: 0x0,
+      speed: 1.0
     };
     
-    // Different configurations for each section
+    // Different camera positions for each section
     switch (activeSection) {
       case 'info':
         return {
           ...baseConfig,
-          points: 12.00,
-          maxDistance: 26.00,
-          spacing: 17.00,
-          backgroundColor: 0x0,
-          speed: 1.2,
+          cameraPosition: [0, 0, 150]
         };
       case 'contact':
         return {
           ...baseConfig,
-          points: 8.00,
-          maxDistance: 22.00,
-          spacing: 20.00,
-          backgroundColor: 0x0,
-          speed: 0.8,
+          cameraPosition: [-100, 20, 80]
         };
       case 'stack':
         return {
           ...baseConfig,
-          points: 16.00,
-          maxDistance: 28.00,
-          spacing: 15.00,
-          backgroundColor: 0x0,
-          speed: 1.5,
+          cameraPosition: [80, -40, 100]
         };
       case 'projects':
         return {
           ...baseConfig,
-          points: 10.00,
-          maxDistance: 24.00,
-          spacing: 18.00,
-          backgroundColor: 0x0,
-          speed: 1.0,
+          cameraPosition: [40, 80, 120]
         };
       default:
-        return baseConfig;
+        return {
+          ...baseConfig,
+          cameraPosition: [0, 0, 150]
+        };
     }
   };
   
@@ -73,25 +60,43 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   const getThemeColors = () => {
     if (theme === 'dark') {
       return {
-        color: 0x3a7ad5,
-        color2: 0x9b87f5,
-        backgroundColor: 0x050505
+        color: 0x3a7ad5,  // Dark blue
+        color2: 0x403E43, // Charcoal Gray
+        backgroundColor: 0x221F26 // Dark Charcoal
       };
     } else {
       return {
-        color: 0x9b87f5,
-        color2: 0x3a7ad5,
-        backgroundColor: 0xfcfcfc
+        color: 0x33C3F0,  // Sky Blue
+        color2: 0x0FA0CE, // Bright Blue
+        backgroundColor: 0xF2FCE2 // Soft Green background
       };
     }
   };
   
   useEffect(() => {
     if (!vantaEffect && vantaRef.current) {
-      // Initialize the effect
+      // Create base configuration
+      const baseConfig = {
+        mouseControls: false,
+        touchControls: false,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        size: 1.5,
+        points: 12.00,
+        maxDistance: 26.00,
+        spacing: 17.00,
+        backgroundColor: 0x0,
+        speed: 1.2,
+      };
+      
+      // Initialize the effect with base config + theme colors
       const config = {
-        ...getSectionConfig(),
+        ...baseConfig,
         ...getThemeColors(),
+        ...getSectionConfig(),
         el: vantaRef.current,
         THREE: THREE
       };
@@ -117,27 +122,31 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
     }
   }, [theme]);
   
-  // Update when active section changes
+  // Update when active section changes - adjust camera position
   useEffect(() => {
     if (vantaEffect) {
       const sectionConfig = getSectionConfig();
       
-      // Animate transition
-      const transitionConfig = {
-        points: sectionConfig.points,
-        maxDistance: sectionConfig.maxDistance,
-        spacing: sectionConfig.spacing,
-        speed: sectionConfig.speed
-      };
-      
-      vantaEffect.setOptions(transitionConfig);
+      // Now we're only changing the camera position, not globe parameters
+      if (vantaEffect.camera) {
+        const [x, y, z] = sectionConfig.cameraPosition;
+        
+        // Animate the camera position
+        gsap.to(vantaEffect.camera.position, {
+          x,
+          y,
+          z,
+          duration: 1.5,
+          ease: "power2.inOut"
+        });
+      }
     }
   }, [activeSection]);
   
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-1/2 h-full z-10 pointer-events-none transition-opacity duration-500"
+      className="fixed top-0 left-0 w-3/5 h-full z-10 pointer-events-none transition-opacity duration-500"
       aria-hidden="true"
     />
   );
