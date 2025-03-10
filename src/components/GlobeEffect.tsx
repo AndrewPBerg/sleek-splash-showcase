@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
-import NET from 'vanta/dist/vanta.globe.min';
+import TOPOLOGY from 'vanta/dist/vanta.topology.min';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -76,7 +76,7 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   
   useEffect(() => {
     if (!vantaEffect && vantaRef.current) {
-      // Create base configuration
+      // Create base configuration for topology
       const baseConfig = {
         mouseControls: false,
         touchControls: false,
@@ -85,12 +85,11 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
         minWidth: 200.00,
         scale: 1.00,
         scaleMobile: 1.00,
-        size: 1.5,
-        points: 12.00,
-        maxDistance: 26.00,
-        spacing: 17.00,
+        points: 15,
+        maxDistance: 25.00,
+        spacing: 16.00,
         backgroundColor: 0x0,
-        speed: 1.2,
+        showDots: true,
       };
       
       // Initialize the effect with base config + theme colors
@@ -102,7 +101,7 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
         THREE: THREE
       };
       
-      const effect = NET(config);
+      const effect = TOPOLOGY(config);
       setVantaEffect(effect);
     }
     
