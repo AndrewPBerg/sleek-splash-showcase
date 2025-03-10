@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import NET from 'vanta/dist/vanta.globe.min';
@@ -124,29 +125,29 @@ const GlobeEffect = ({ activeSection }: GlobeEffectProps) => {
   
   // Update when active section changes - adjust camera position
   useEffect(() => {
-    if (vantaEffect) {
+    if (vantaEffect && vantaEffect.camera) {
       const sectionConfig = getSectionConfig();
+      const [targetX, targetY, targetZ] = sectionConfig.cameraPosition;
       
-      // Now we're only changing the camera position, not globe parameters
-      if (vantaEffect.camera) {
-        const [x, y, z] = sectionConfig.cameraPosition;
-        
-        // Animate the camera position
-        gsap.to(vantaEffect.camera.position, {
-          x,
-          y,
-          z,
-          duration: 1.5,
-          ease: "power2.inOut"
-        });
-      }
+      // Kill any ongoing animations to prevent rubber-banding
+      gsap.killTweensOf(vantaEffect.camera.position);
+      
+      // Animate the camera position with smoother settings
+      gsap.to(vantaEffect.camera.position, {
+        x: targetX,
+        y: targetY,
+        z: targetZ,
+        duration: 2, // Slightly longer for smoother motion
+        ease: "power2.inOut",
+        overwrite: "auto" // Ensure we don't conflict with other animations
+      });
     }
   }, [activeSection]);
   
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-3/5 h-full z-10 pointer-events-none transition-opacity duration-500"
+      className="fixed top-0 left-0 w-3/5 h-full z-10 pointer-events-none transition-opacity duration-500 pl-12 pr-12 pt-12 pb-12"
       aria-hidden="true"
     />
   );
