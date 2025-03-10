@@ -1,7 +1,9 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import gsap from 'gsap';
 import { useTheme } from '../hooks/useTheme';
+import GlobeEffect from './GlobeEffect';
 
 const sections = [
   { id: 'info', title: 'Info' },
@@ -40,7 +42,7 @@ const Layout = () => {
     
     const activeButtonRef = buttonRefs.current[activeSection];
     if (activeButtonRef) {
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
+      const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.1 });
       
       const glowColor = theme === 'dark'
         ? 'rgba(200, 200, 200, 0.5)'
@@ -48,12 +50,12 @@ const Layout = () => {
       
       tl.to(activeButtonRef, {
         boxShadow: `0 0 8px 2px ${glowColor}`,
-        duration: 0.4,
+        duration: 0.3, // Speed up animation
         ease: "sine.inOut"
       })
       .to(activeButtonRef, {
         boxShadow: '0 0 0px 0px rgba(128, 128, 128, 0)',
-        duration: 0.4,
+        duration: 0.3, // Speed up animation
         ease: "sine.inOut"
       });
     }
@@ -149,7 +151,7 @@ const Layout = () => {
       const exitTl = gsap.timeline({
         defaults: {
           ease: "power2.in",
-          duration: 0.3
+          duration: 0.3 // Speed up animation
         },
         onComplete: () => {
           navigate(`/${id}`);
@@ -181,6 +183,9 @@ const Layout = () => {
   
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
+      {/* Globe Effect */}
+      <GlobeEffect activeSection={activeSection} />
+      
       <div className="fixed top-6 right-6 z-50">
         <div className="flex items-center">
           <span className="text-xs mr-2 font-sans tracking-wide">
