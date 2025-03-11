@@ -1,69 +1,47 @@
-# Welcome to your Lovable project
+# Andrew Berg's GitHub Pages Site
 
-## Project info
+This repository contains the source code for my personal website hosted at [andrewpberg.github.io](https://andrewpberg.github.io).
 
-**URL**: https://lovable.dev/projects/2b9fa7fe-ff8a-401c-9114-96fbc4f713ae
+Feel free to clone this code for your own use case. Just make sure to credit me on the site thanks 🤝
 
-## How can I edit this code?
+## Info
+used the following stack:
+- three.js
+- GSAP
+- vantra.js
+- vite
+- react
+- node.js
+- lucide UI
 
-There are several ways of editing your application.
+## Development
 
-**Use Lovable**
+To run the development server:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2b9fa7fe-ff8a-401c-9114-96fbc4f713ae) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The site will be available at http://localhost:8080.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Deployment
 
-**Use GitHub Codespaces**
+The site is automatically deployed to GitHub Pages when changes are pushed to the main branch using GitHub Actions.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+To manually deploy:
 
-## What technologies are used for this project?
+```bash
+npm run deploy
+```
 
-This project is built with .
+Or use the provided shell script:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
 
-## How can I deploy this project?
+### Important Note About GitHub Pages and Jekyll
 
-Simply open [Lovable](https://lovable.dev/projects/2b9fa7fe-ff8a-401c-9114-96fbc4f713ae) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This repository includes a `.nojekyll` file in both the `public` directory and the build output to prevent GitHub Pages from processing the site with Jekyll. This is necessary for React applications to work correctly on GitHub Pages.
