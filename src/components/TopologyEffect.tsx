@@ -4,6 +4,7 @@ import { useTheme } from '../hooks/useTheme';
 import TOPOLOGY from './vanta/topology.js';
 import colorSchemes from '../config/colorSchemes';
 import * as THREE from 'three';
+import { useIsMobile } from '../hooks/use-mobile';
 
 // Import p5.js dynamically to avoid SSR issues
 let p5: any = null;
@@ -15,28 +16,43 @@ interface TopologyEffectProps {
 // Use memo to prevent unnecessary re-renders
 const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) => {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffectRef = useRef<any>(null);
   const [p5Loaded, setP5Loaded] = useState(false);
   const prevThemeRef = useRef(theme);
   const prevSectionRef = useRef(activeSection);
   
-  // Load p5.js dynamically
+  // Load p5.js dynamically with optimized loading
   useEffect(() => {
-    if (typeof window !== 'undefined' && !p5) {
-      import('p5').then((p5Module) => {
-        p5 = p5Module.default;
-        setP5Loaded(true);
-      });
-    }
+    let isMounted = true;
     
-    // Add THREE to window for VANTA
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !p5) {
+      // Add THREE to window for VANTA before p5 is loaded
+      (window as any).THREE = THREE;
+      
+      // Optimized async loading
+      const loadP5 = async () => {
+        try {
+          const p5Module = await import('p5');
+          if (isMounted) {
+            p5 = p5Module.default;
+            setP5Loaded(true);
+          }
+        } catch (error) {
+          console.error("Failed to load p5.js:", error);
+        }
+      };
+      
+      loadP5();
+    } else if (typeof window !== 'undefined') {
+      // Just ensure THREE is on window
       (window as any).THREE = THREE;
     }
     
     // Cleanup function
     return () => {
+      isMounted = false;
       if (vantaEffectRef.current) {
         vantaEffectRef.current.destroy();
         vantaEffectRef.current = null;
@@ -56,7 +72,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     prevThemeRef.current = theme;
   }, [theme]);
 
-  // Initialize or update the effect
+  // Initialize or update the effect with optimized settings for mobile
   useEffect(() => {
     if (!vantaRef.current || !p5Loaded) return;
     
@@ -70,7 +86,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     console.log(`Initializing topology effect: theme=${theme}, section=${activeSection}`);
     console.log(`Colors: bg=${backgroundColor.toString(16)}, fg=${foregroundColor.toString(16)}`);
 
-    // If effect doesn't exist, create it
+    // Mobile optimizations
+    const particleCount = isMobile ? 2500 : 4000;
+    const particleSize = isMobile ? 1.2 : 1.4;
+    const noiseSize = isMobile ? 0.004 : 0.003; // Slightly larger noise for mobile
+    const scale = isMobile ? 0.8 : 1.0;
+
+    // If effect doesn't exist, create it with optimized settings
     if (!vantaEffectRef.current) {
       try {
         vantaEffectRef.current = TOPOLOGY({
@@ -81,15 +103,15 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           gyroControls: false,
           minHeight: 100.00,
           minWidth: 100.00,
-          scale: 1.0,
+          scale: scale,
           scaleMobile: 0.8,
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          speed: 1.0,
-          particleCount: 4000,
-          particleSize: 1.4,
-          flowCellSize: 10,
-          noiseSize: 0.003,
+          speed: isMobile ? 0.8 : 1.0, // Slightly slower for mobile
+          particleCount: particleCount,
+          particleSize: particleSize,
+          flowCellSize: isMobile ? 12 : 10,
+          noiseSize: noiseSize,
           noiseRadius: 0.1,
           colorMode: 'variance',
           colorVariance: 0.25,
@@ -119,7 +141,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     // Update refs with current values
     prevSectionRef.current = activeSection;
     
-  }, [p5Loaded, theme, activeSection]);
+  }, [p5Loaded, theme, activeSection, isMobile]);
 
   return (
     <div 
@@ -130,8 +152,8 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
         transform: 'translate3d(0,0,0)',
         backfaceVisibility: 'hidden',
         mixBlendMode: 'normal',
-        filter: 'contrast(1.4) brightness(1.5)',
-        padding: '56px', // Add 50+ pixels of padding
+        filter: isMobile ? 'contrast(1.2) brightness(1.3)' : 'contrast(1.4) brightness(1.5)',
+        padding: '56px',
       }}
     />
   );

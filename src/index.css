@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,11 +70,13 @@
     overflow: hidden;
   }
   
+  /* Improved theme transition for better performance */
   .theme-transition,
   .theme-transition * {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
+    will-change: color, background-color, border-color, box-shadow;
   }
   
   body {
@@ -138,17 +141,15 @@
   display: none;  /* Chrome, Safari and Opera */
 }
 
-/* Splash screen styles */
-.absolute-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  width: 100%;
+/* Custom theme toggle button styles */
+.theme-toggle-btn {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-/* Responsive styles */
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .section-heading {
     @apply text-2xl;
@@ -159,14 +160,12 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 5rem; /* Ensure content doesn't overlap with navigation */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   
   .content-container::-webkit-scrollbar {
     display: none;
-  }
-  
-  .content-container {
-    scrollbar-width: none;
   }
   
   /* Ensure content is properly centered and doesn't overlap with UI elements */
@@ -177,34 +176,32 @@
   
   /* Improve tap targets for mobile */
   button {
-    min-height: 25px;
+    min-height: 40px;
     min-width: 40px;
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
-  /* Ensure theme toggle is easily tappable */
-  .theme-toggle {
-    touch-action: manipulation;
+  /* Optimize typography for mobile */
+  p, li, span {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Font face declarations */
-/* @font-face {
-  font-family: 'Inter var';
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: normal;
-  font-named-instance: 'Regular';
-  src: url('https://rsms.me/inter/font-files/Inter-roman.var.woff2?v=3.19') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter var';
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: italic;
-  font-named-instance: 'Italic';
-  src: url('https://rsms.me/inter/font-files/Inter-italic.var.woff2?v=3.19') format('woff2');
-} */
+/* Rest of the existing font declarations */
+/* ... keep existing code (font face declarations) */

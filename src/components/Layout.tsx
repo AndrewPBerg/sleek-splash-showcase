@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import gsap from 'gsap';
@@ -65,20 +66,19 @@ const Layout = () => {
     }
   }, [activeSection, isAnimating, isMobile, navigate]);
   
+  // Improved theme toggle with smoother transitions
   const toggleTheme = useCallback(() => {
-    // Use requestAnimationFrame for smoother theme transitions
+    // Add transition class before changing theme for better performance
+    document.documentElement.classList.add('theme-transition');
+    
+    // Use RAF to ensure CSS changes are batched for better performance
     requestAnimationFrame(() => {
-      document.body.classList.add('theme-transition');
+      setTheme(theme === 'dark' ? 'light' : 'dark');
       
-      // Use requestAnimationFrame for the theme change
-      requestAnimationFrame(() => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-        
-        // Remove the transition class after animation completes
-        setTimeout(() => {
-          document.body.classList.remove('theme-transition');
-        }, 300);
-      });
+      // Remove transition class after animation completes
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transition');
+      }, 300);
     });
   }, [theme, setTheme]);
   
@@ -191,32 +191,34 @@ const Layout = () => {
     <div className="min-h-screen flex flex-col p-4 md:p-8">
       {topologyEffect}
       
-      {/* Theme Toggle - optimized with hardware acceleration */}
-      <div className={`fixed ${isMobile ? 'top-6 left-6' : 'top-6 right-6'} z-50`}>
-        <div className="flex items-center">
-          <span className={`${isMobile ? 'text-sm' : 'text-xs'} mr-2 font-sans tracking-wide`}>
+      {/* Redesigned Theme Toggle */}
+      <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-6 right-6'} z-50`}>
+        <button
+          onClick={toggleTheme}
+          className={`theme-toggle-btn group flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 will-change-transform ${
+            theme === 'dark' 
+              ? 'bg-background/60 border-primary/20 hover:bg-background/80' 
+              : 'bg-background/80 border-border hover:bg-background'
+          }`}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          style={{ transform: 'translateZ(0)' }}
+        >
+          <div className="relative w-10 h-5 flex items-center rounded-full transition-colors duration-300 bg-gradient-to-r from-muted to-muted/70 p-0.5">
+            <div 
+              className={`absolute w-4 h-4 rounded-full transition-all duration-300 shadow-sm will-change-transform ${
+                theme === 'dark' 
+                  ? 'translate-x-5 bg-primary' 
+                  : 'translate-x-0 bg-background'
+              }`}
+              style={{ transform: `translateZ(0) translateX(${theme === 'dark' ? '20px' : '0px'})` }}
+            />
+          </div>
+          <span className={`text-xs font-medium tracking-wider transition-opacity duration-300 ${
+            isMobile ? 'opacity-0 w-0' : 'opacity-100'
+          }`}>
             {theme === 'dark' ? 'DARK' : 'LIGHT'}
           </span>
-          <button
-            onClick={toggleTheme}
-            className={`theme-toggle ${isMobile ? 'w-10 h-3' : 'w-10 h-6'} transition-colors duration-200 ${
-              theme === 'dark' 
-                ? 'bg-primary border-primary' 
-                : 'bg-secondary border-secondary'
-            } border rounded-sm will-change-transform`}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            style={{ transform: 'translateZ(0)' }}
-          >
-            <div 
-              className={`${isMobile ? 'w-3 h-3' : 'w-3 h-3'} transition-transform duration-200 will-change-transform ${
-                theme === 'dark' 
-                  ? `bg-background ${isMobile ? 'translate-x-4' : 'translate-x-5'}` 
-                  : `bg-foreground ${isMobile ? '-translate-x-0' : 'translate-x-2'}`
-              }`}
-              style={{ transform: `translateZ(0) translate3d(${theme === 'dark' ? (isMobile ? '4px' : '5px') : (isMobile ? '0' : '2px')}, 0, 0)` }}
-            />
-          </button>
-        </div>
+        </button>
       </div>
       
       {/* Desktop Navigation and Content */}
@@ -267,10 +269,10 @@ const Layout = () => {
         </div>
       )}
       
-      {/* Mobile Navigation and Content */}
+      {/* Mobile Navigation and Content - Optimized for performance */}
       {isMobile && (
         <>
-          {/* Mobile Navigation Menu - Fixed at bottom */}
+          {/* Mobile Navigation Menu - Fixed at bottom with improved tap targets */}
           <div className="fixed bottom-6 left-0 right-0 z-50">
             <div className="flex flex-row justify-center mx-auto">
               <div className="bg-background/90 backdrop-blur-md py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
@@ -279,7 +281,7 @@ const Layout = () => {
                   <button
                     key={section.id}
                     onClick={() => handleSectionChange(section.id)}
-                    className={`group flex flex-col items-center gap-1.5 focus:outline-none ${
+                    className={`group flex flex-col items-center gap-1.5 py-1 px-1 focus:outline-none ${
                       isAnimating ? 'pointer-events-none opacity-70' : ''
                     }`}
                     disabled={isAnimating}
@@ -306,14 +308,22 @@ const Layout = () => {
             </div>
           </div>
           
-          {/* Mobile Content - Centered in view */}
+          {/* Mobile Content - Centered with improved scrolling */}
           {sections.map((section) => (
             section.id === activeSection && (
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
                 className="content-container fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] px-4 will-change-transform"
-                style={{ opacity: 0, transform: 'translate3d(-50%, -50%, 0)' }}
+                style={{ 
+                  opacity: 0, 
+                  transform: 'translate3d(-50%, -50%, 0)',
+                  maxHeight: '70vh',
+                  overflowY: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  msOverflowStyle: 'none',
+                  scrollbarWidth: 'none',
+                }}
               >
                 <div className="flex flex-col items-center">
                   <Outlet />
