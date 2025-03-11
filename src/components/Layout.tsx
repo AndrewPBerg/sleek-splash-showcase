@@ -195,10 +195,10 @@ const Layout = () => {
       <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-6 right-6'} z-50`}>
         <button
           onClick={toggleTheme}
-          className={`theme-toggle-btn group flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 will-change-transform ${
+          className={`theme-toggle-btn glass-panel group flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 will-change-transform ${
             theme === 'dark' 
-              ? 'bg-background/60 border-primary/20 hover:bg-background/80' 
-              : 'bg-background/80 border-border hover:bg-background'
+              ? 'bg-background/40 border-primary/20 hover:bg-background/60' 
+              : 'bg-background/60 border-border hover:bg-background/80'
           }`}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           style={{ transform: 'translateZ(0)' }}
@@ -255,10 +255,10 @@ const Layout = () => {
                 {section.id === activeSection && (
                   <div 
                     ref={el => contentRefs.current[section.id] = el}
-                    className="content-container mt-6 w-80 pr-6 will-change-transform"
+                    className="content-container glass-panel mt-6 w-80 pr-6 will-change-transform"
                     style={{ opacity: 0, transform: 'translateZ(0)' }}
                   >
-                    <div>
+                    <div className="p-4">
                       <Outlet />
                     </div>
                   </div>
@@ -275,7 +275,7 @@ const Layout = () => {
           {/* Mobile Navigation Menu - Fixed at bottom with improved tap targets */}
           <div className="fixed bottom-6 left-0 right-0 z-50">
             <div className="flex flex-row justify-center mx-auto">
-              <div className="bg-background/90 backdrop-blur-md py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
+              <div className="menu-glass py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
                    style={{ transform: 'translateZ(0)' }}>
                 {sections.map((section) => (
                   <button
@@ -314,7 +314,7 @@ const Layout = () => {
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
-                className="content-container fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] px-4 will-change-transform"
+                className="content-container glass-panel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] will-change-transform"
                 style={{ 
                   opacity: 0, 
                   transform: 'translate3d(-50%, -50%, 0)',
@@ -325,7 +325,7 @@ const Layout = () => {
                   scrollbarWidth: 'none',
                 }}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center p-5">
                   <Outlet />
                 </div>
               </div>

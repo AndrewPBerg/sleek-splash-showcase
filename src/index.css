@@ -105,8 +105,27 @@
   text-wrap: balance;
 }
 
+/* Enhanced glass panel for menu and content */
 .glass-panel {
-  @apply bg-background/80 backdrop-blur-sm border border-border rounded-lg shadow-sm;
+  @apply bg-background/65 backdrop-blur-md border border-border/40 rounded-lg shadow-sm;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: glass-fade-in 0.4s ease-out forwards;
+}
+
+.dark .glass-panel {
+  @apply bg-background/50 border-white/10;
+}
+
+/* Glass animation keyframes */
+@keyframes glass-fade-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
 }
 
 .nav-indicator {
@@ -127,6 +146,16 @@
 .section-content.active {
   height: auto;
   opacity: 1;
+}
+
+/* Menu glass panel */
+.menu-glass {
+  @apply bg-background/75 backdrop-blur-md border border-border/30 shadow-sm;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .menu-glass {
+  @apply bg-background/40 border-white/10;
 }
 
 /* Hide scrollbars but keep scrolling functionality */
