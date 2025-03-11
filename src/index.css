@@ -76,7 +76,7 @@
   .theme-transition * {
     transition-property: color, background-color, border-color;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
+    transition-duration: 150ms; /* Reduced for faster theme switching */
     will-change: color, background-color, border-color;
   }
   
@@ -109,39 +109,82 @@
 /* Enhanced glass panel for menu and content */
 .glass-panel {
   @apply bg-background/65 backdrop-blur-md border border-border/40 rounded-lg shadow-sm;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: glass-fade-in 0.3s ease-out forwards;
+  transition: all 0.18s cubic-bezier(0.3, 0, 0.2, 1);
+  animation: glass-fade-in 0.25s ease-out forwards;
+  transform: translateZ(0);
+  will-change: opacity, transform;
 }
 
 .dark .glass-panel {
   @apply bg-background/50 border-white/10;
 }
 
-/* Glass animation keyframes */
+/* Glass animation keyframes with improved timing */
 @keyframes glass-fade-in {
   from {
     opacity: 0;
     backdrop-filter: blur(0);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
     backdrop-filter: blur(8px);
+    transform: translateY(0) scale(1);
   }
 }
 
+/* Enhanced menu option animations */
 .nav-indicator {
-  @apply h-2 w-1.5 rounded-full bg-muted-foreground/40 transition-all duration-200;
+  @apply h-2 w-1.5 rounded-full bg-muted-foreground/40;
+  transition: all 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: width, background-color;
+  transform: translateZ(0);
 }
 
 .nav-indicator.active {
   @apply w-3 bg-primary;
+  animation: pulse-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 0px transparent;
+  }
+  to {
+    box-shadow: 0 0 4px rgba(var(--primary), 0.4);
+  }
+}
+
+.nav-text {
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: color, transform;
+  transform: translateZ(0);
+}
+
+.nav-text.active {
+  animation: text-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes text-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .section-content {
   height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: height 0.2s ease, opacity 0.2s ease;
+  transform: translateZ(0);
+  transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height, opacity;
 }
 
 .section-content.active {
@@ -149,10 +192,12 @@
   opacity: 1;
 }
 
-/* Menu glass panel */
+/* Menu glass panel with enhanced transitions */
 .menu-glass {
   @apply bg-background/75 backdrop-blur-md border border-border/30 shadow-sm;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: background-color, backdrop-filter;
+  transform: translateZ(0);
 }
 
 .dark .menu-glass {
@@ -177,6 +222,50 @@
   backface-visibility: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+/* Content animation for smoother section transitions */
+.content-animation-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.content-animation-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease-out, transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.content-animation-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.content-animation-exit-active {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.18s ease-in, transform 0.18s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* Better text rendering for Stack page */
+.stack-text {
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+.stack-item {
+  background: linear-gradient(to right, rgba(var(--secondary), 0.6), rgba(var(--secondary), 0.5));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.2s ease;
+}
+
+.stack-item:hover {
+  transform: translateY(-1px) scale(1.01);
 }
 
 /* Mobile optimizations */

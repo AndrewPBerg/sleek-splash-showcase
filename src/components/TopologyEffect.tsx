@@ -87,9 +87,9 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     console.log(`Colors: bg=${backgroundColor.toString(16)}, fg=${foregroundColor.toString(16)}`);
 
     // Mobile optimizations
-    const particleCount = isMobile ? 2500 : 4000;
-    const particleSize = isMobile ? 1.2 : 1.4;
-    const noiseSize = isMobile ? 0.004 : 0.003; // Slightly larger noise for mobile
+    const particleCount = isMobile ? 2000 : 3500;
+    const particleSize = isMobile ? 1.0 : 1.2;
+    const noiseSize = isMobile ? 0.006 : 0.005; // Increased noise size for faster movement
     const scale = isMobile ? 0.8 : 1.0;
 
     // If effect doesn't exist, create it with optimized settings
@@ -107,12 +107,12 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           scaleMobile: 0.8,
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          speed: isMobile ? 0.8 : 1.0, // Slightly slower for mobile
+          speed: isMobile ? 1.5 : 1.8, // Increased speed for both mobile and desktop
           particleCount: particleCount,
           particleSize: particleSize,
-          flowCellSize: isMobile ? 12 : 10,
+          flowCellSize: isMobile ? 10 : 8, // Smaller flow cells for faster movement
           noiseSize: noiseSize,
-          noiseRadius: 0.1,
+          noiseRadius: 0.12, // Increased noise radius
           colorMode: 'variance',
           colorVariance: 0.25,
           pulseIntensity: 0,
@@ -146,13 +146,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-60 will-change-transform" 
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-65 will-change-transform" 
       aria-hidden="true"
       style={{ 
         transform: 'translate3d(0,0,0)',
         backfaceVisibility: 'hidden',
         mixBlendMode: 'normal',
-        filter: isMobile ? 'contrast(1.2) brightness(1.3)' : 'contrast(1.4) brightness(1.5)',
+        filter: isMobile ? 'contrast(1.3) brightness(1.4)' : 'contrast(1.5) brightness(1.6)',
         padding: '56px',
       }}
     />
