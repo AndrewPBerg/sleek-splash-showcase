@@ -47,8 +47,18 @@ export function ThemeProvider({
         : "light";
       
       root.classList.add(systemTheme);
+      
+      // Dispatch custom event for theme change
+      window.dispatchEvent(new CustomEvent('themechange', { 
+        detail: { theme: systemTheme } 
+      }));
     } else {
       root.classList.add(theme);
+      
+      // Dispatch custom event for theme change
+      window.dispatchEvent(new CustomEvent('themechange', { 
+        detail: { theme } 
+      }));
     }
     
     // Remove transition class after the change is complete
@@ -67,12 +77,18 @@ export function ThemeProvider({
     
     const handleChange = () => {
       const root = window.document.documentElement;
+      const systemTheme = mediaQuery.matches ? "dark" : "light";
       
       // Add transition class for system theme changes
       root.classList.add('theme-transition');
       
       root.classList.remove("light", "dark");
-      root.classList.add(mediaQuery.matches ? "dark" : "light");
+      root.classList.add(systemTheme);
+      
+      // Dispatch custom event for theme change
+      window.dispatchEvent(new CustomEvent('themechange', { 
+        detail: { theme: systemTheme } 
+      }));
       
       // Remove transition class after the change is complete
       setTimeout(() => {
